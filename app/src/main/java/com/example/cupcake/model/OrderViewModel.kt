@@ -20,7 +20,7 @@ class OrderViewModel : ViewModel() {
     val date: LiveData<String> = _date
 
     private val _price = MutableLiveData<Double>()
-    val price: LiveData<String> = Transformations.map(_price){
+    val price: LiveData<String> = Transformations.map(_price) {
         NumberFormat.getCurrencyInstance().format(it)
     }
 
@@ -34,6 +34,7 @@ class OrderViewModel : ViewModel() {
     init {
         resetOrder()
     }
+
     fun setQuantity(numberCupcakes: Int) {
         _quantity.value = numberCupcakes
         updatePrice()
@@ -48,37 +49,38 @@ class OrderViewModel : ViewModel() {
         updatePrice()
     }
 
-    fun hasNoFlavorSet(): Boolean{
+    fun hasNoFlavorSet(): Boolean {
         return _flavor.value.isNullOrEmpty()
     }
 
-    private fun getPickupOptions(): List<String>{
+    private fun getPickupOptions(): List<String> {
         val options = mutableListOf<String>()
         val formatter = SimpleDateFormat("E MMM d", Locale.getDefault())
         val calendar = Calendar.getInstance()
         // Create a list of dates starting with the current date and the following 3 dates
-        repeat(4){
+        repeat(4) {
             options.add(formatter.format(calendar.time))
             calendar.add(Calendar.DATE, 1)
         }
         return options
     }
 
-    fun resetOrder(){
+    fun resetOrder() {
         _quantity.value = 0
         _flavor.value = ""
         _date.value = dateOptions[0]
         _price.value = 0.0
 
     }
-    private fun updatePrice(){
+
+    private fun updatePrice() {
         //el ?: indica que si quantity.value no es nulo, se usa, si es nula se usa 0 (la
         //expresión de la derecha)
 
         var calculatedPrice = (quantity.value ?: 0) * PRICE_PER_CUPCAKE
 
         // If the user selected the first option (today) for pickup, add the surcharge
-        if (dateOptions[0] == _date.value){
+        if (dateOptions[0] == _date.value) {
             calculatedPrice += PRICE_FOR_SAME_DAY_PICKUP
         }
         _price.value = calculatedPrice
